@@ -13,9 +13,13 @@
 #include "Pin.h"
 #include "Configuration.h"
 #include "Reel_Controller.h"
+#include "servo.h"
+#include "analog.h"
+
+uint16_t thresh;
 
 int main(void)
-{
+{	
 	RED_PIN.setDirection(true);
 	GRN_PIN.setDirection(true);
 	YEL_PIN.setDirection(true);
@@ -23,30 +27,29 @@ int main(void)
     asynctwi::init();
 	asynctwi::setAddress(SLAVE_ADDRESS);
 	asynctwi::attachSlaveRxEvent(handle_rx);
-	
+	servo::init_pwm();
+	analog::init(1);
+
 	while (1) {
-		RED_PIN.setValue(true);
-		_delay_ms(300);
-		YEL_PIN.setValue(true);
-		_delay_ms(300);
-		GRN_PIN.setValue(true);
-		_delay_ms(300);
-		RED_PIN.setValue(false);
-		_delay_ms(300);
-		YEL_PIN.setValue(false);
-		_delay_ms(300);
-		GRN_PIN.setValue(false);
-		_delay_ms(300);
+		update_thresh();
+		analog::set_channel(1);
+		GRN_PIN.setValue(analog::read_once()>thresh);
 	}
 }
 
 void handle_rx(uint8_t* buffer, int len)
 {
-	RED_PIN.setValue(true);
-	YEL_PIN.setValue(true);
-	GRN_PIN.setValue(true);
-	_delay_ms(100);
-	RED_PIN.setValue(false);
-	YEL_PIN.setValue(false);
-	GRN_PIN.setValue(false);
+	uint8_t lsb = buffer[0];
+	uint8_t msb = buffer[1];
+
+	servo::move_pwm(lsb);
 }	
+
+void update_thresh(void){
+	analog::set_channel(0);
+	thresh = analog::read_once();
+}
+
+void forward_holes(uint8_t holes){
+	
+}
