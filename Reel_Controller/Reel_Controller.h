@@ -7,3 +7,4 @@
 
 int main(void);
 void handle_rx(uint8_t* buffer, int len);
+void init(void);

@@ -11,13 +11,13 @@
 namespace analog {
 
 void init(uint8_t channel){
-	DIDR0 = 1<<channel;								// Disable digital input buffer (functionality) on channel pin
 	ADMUX &= ~((1<<REFS1)|(1<<REFS0));				// AREF is used by default, set REFS1 and REFS0 low just in case
 	set_channel(channel);							// Specify initialization channel
 	ADCSRA |= ((1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0));	// Prescale by 128, gives 156 KHz
 }
 
 void set_channel(uint8_t channel){
+	DIDR0 = 1<<channel;								// Disable digital input buffer (functionality) on channel pin
 	ADMUX &= 0b11110000;
 	ADMUX |= channel&(0b00001111);
 	wait_for_completion();
@@ -52,11 +52,11 @@ void stop(void){
 }
 
 void wait_for_completion(void){
-	if (!(ADCSRA & (1 << ADSC))){		// Exit if there is no conversion in progress
+	if (!(ADCSRA & (1 << ADSC))){			// Exit if there is no conversion in progress
 		return;
 	}
-	ADCSRA|=(1<<ADIF);					// Clear flag
-	while (!(ADCSRA & (1 << ADIF)));		// But if not, wait until completion flag is set
+	ADCSRA|=(1<<ADIF);						// But if not, clear flag and wait until completion flag is set
+	while (!(ADCSRA & (1 << ADIF)));
 }
 
 }

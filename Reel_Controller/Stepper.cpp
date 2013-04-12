@@ -1,6 +1,6 @@
 /*
  * Stepper.cpp
- * Limited use, but doesn't use timers!
+ * Rewriting to use timers
  *
  * Created: 3/8/2013 3:15:53 PM
  *  Author: Anthony
@@ -46,7 +46,7 @@ namespace stepper {
 		uint32_t del = 1000000/speed;
 		for (uint16_t n=0; n<steps; n++){
 			STEP_PIN.setValue(!STEP_PIN.getValue());
-			_delay_us(del);
+			//_delay_us(del);
 		}
 	}
 }

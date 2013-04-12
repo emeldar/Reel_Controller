@@ -29,13 +29,15 @@
 // This is verified true for the 168/328/644p/1280/2560.
 
 // We support three platforms: Atmega168 (1 UART), Atmega644, and Atmega1280/2560
+// AM: Adding support for thirst platofrm, Atmega325A
 #if defined (__AVR_ATmega168__)     \
-    || defined (__AVR_ATmega328P__)  \
-    || defined (__AVR_ATmega644P__) \
-    || defined (__AVR_ATmega1280__) \
-    || defined (__AVR_ATmega2560__)
+	|| defined (__AVR_ATmega328P__)  \
+	|| defined (__AVR_ATmega644P__) \
+	|| defined (__AVR_ATmega1280__) \
+	|| defined (__AVR_ATmega2560__) \
+	|| defined (__AVR_ATmega325A__)
 #else
-    #error UART not implemented on this processor type!
+	#error UART not implemented on this processor type!
 #endif
 
 
@@ -76,16 +78,21 @@ void AvrPort::setPin(uint8_t pin_index, bool on) {
 
 #if defined(__AVR_ATmega644P__) || \
 	defined(__AVR_ATmega1280__) || \
-	defined(__AVR_ATmega2560__)
+	defined(__AVR_ATmega2560__) || \
+	defined(__AVR_ATmega325A__)
 AvrPort PortA(0x20);
 #endif // __AVR_ATmega644P__
 AvrPort PortB(0x23);
 AvrPort PortC(0x26);
 AvrPort PortD(0x29);
-#if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
+#if defined (__AVR_ATmega1280__) || \
+	defined (__AVR_ATmega2560__) || \
+	defined (__AVR_ATmega325A__)
 AvrPort PortE(0x2C);
 AvrPort PortF(0x2F);
 AvrPort PortG(0x32);
+#endif
+#if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
 AvrPort PortH(0x100);
 AvrPort PortJ(0x103);
 AvrPort PortK(0x106);

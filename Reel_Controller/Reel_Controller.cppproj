@@ -5,7 +5,7 @@
     <ProjectVersion>6.0</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8</ToolchainName>
     <ProjectGuid>{260cf4bf-6391-4c66-bad3-0c5488c71bd0}</ProjectGuid>
-    <avrdevice>ATmega168</avrdevice>
+    <avrdevice>ATmega325A</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>Executable</OutputType>
     <Language>CPP</Language>
@@ -21,7 +21,8 @@
     <OverrideVtorValue />
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfVersion>3.5.0</AsfVersion>
-    <avrtool>com.atmel.avrdbg.tool.ispmk2</avrtool>
+    <avrtool>
+    </avrtool>
     <avrtoolinterface>ISP</avrtoolinterface>
     <com_atmel_avrdbg_tool_ispmk2>
       <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
@@ -110,12 +111,6 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AsyncTwi.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="AsyncTwi.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="AvrPort.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -135,12 +130,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Stepper.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="servo.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="servo.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Reel_Controller.h">

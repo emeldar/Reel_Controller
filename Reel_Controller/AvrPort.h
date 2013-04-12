@@ -22,7 +22,8 @@
 
 #if defined (__AVR_ATmega168__) \
     || defined (__AVR_ATmega328P__) \
-    || defined (__AVR_ATmega644P__)
+    || defined (__AVR_ATmega644P__) \
+	|| defined (__AVR_ATmega325A__)
 
     typedef uint8_t port_base_t;
     #define NULL_PORT 0xff
@@ -45,11 +46,13 @@
 // This is verified true for the 168/328/644p/1280/2560.
 
 // We support three platforms: Atmega168 (1 UART), Atmega644, and Atmega1280/2560
+// AM: Adding support for thirst platofrm, Atmega325A
 #if defined (__AVR_ATmega168__)     \
     || defined (__AVR_ATmega328P__)  \
     || defined (__AVR_ATmega644P__) \
     || defined (__AVR_ATmega1280__) \
-    || defined (__AVR_ATmega2560__)
+    || defined (__AVR_ATmega2560__) \
+	|| defined (__AVR_ATmega325A__)
 #else
     #error UART not implemented on this processor type!
 #endif
