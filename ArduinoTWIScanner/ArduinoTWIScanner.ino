@@ -33,8 +33,7 @@ void loop()
 {
   byte error, address;
   int nDevices;
-
-  Serial.println("Scanning...");
+  int bytes;
 
   nDevices = 0;
   //Note all I2C addresses are an even number.
@@ -59,7 +58,14 @@ void loop()
         Serial.print("0");
       Serial.print(address,HEX);
       Serial.println(" !");
-
+      
+      Wire.beginTransmission(address); //Correct.
+      bytes = Wire.write(0x04);
+      Wire.endTransmission();
+      
+      Serial.print("Wrote a 0x04 to device at ");
+      Serial.println(address,HEX);
+      
       nDevices++;
     }
     else if (error==4) 
@@ -72,8 +78,6 @@ void loop()
   }
   if (nDevices == 0)
     Serial.println("No I2C devices found\n");
-  else
-    Serial.println("done\n");
 
   delay(3000);           // wait 8 seconds for next scan
 }

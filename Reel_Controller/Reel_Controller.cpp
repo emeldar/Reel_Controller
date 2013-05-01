@@ -19,22 +19,18 @@
 int main(void)
 {	
 	init();
-	analog::init(1);
-	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);
-
-	while (1) {
-		analog::set_channel(1);
-		GRN_PIN.setValue(analog::read_once()>THRESH);
-	}
+	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);		// Never returns
 }
 
 void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length, 
 				volatile const uint8_t *input_buffer, volatile uint8_t *output_buffer_length, 
 				volatile uint8_t *output_buffer)
 {
+	YEL_PIN.setValue(true);
 	uint8_t lsb = input_buffer[0];
 	uint8_t msb = input_buffer[1];
-
+	_delay_ms(100);
+	YEL_PIN.setValue(false);
 }	
 
 void forward_holes(uint8_t holes){
@@ -58,5 +54,5 @@ void init(){
 }
 
 void idle(void){
-	return;
+	GRN_PIN.setValue(true);
 }

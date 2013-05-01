@@ -6,6 +6,7 @@
  *  Author: Anthony
  */ 
 
+#include "Configuration.h"
 #include "Stepper.h"
 #include "Pin.h"
 #include <avr/io.h>
@@ -38,7 +39,7 @@ void Stepper::enable(void){
 }
 
 void Stepper::stopTimer(void){
-	TCCR0A &= ~(1<<CS00)|(1<<CS02));	// Timer off
+	TCCR0A &= ~((1<<CS00)|(1<<CS02));	// Timer off
 }
 
 void Stepper::startTimer(void){
