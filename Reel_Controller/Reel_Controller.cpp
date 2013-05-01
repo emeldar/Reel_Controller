@@ -26,11 +26,44 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 				volatile const uint8_t *input_buffer, volatile uint8_t *output_buffer_length, 
 				volatile uint8_t *output_buffer)
 {
-	YEL_PIN.setValue(true);
 	uint8_t lsb = input_buffer[0];
 	uint8_t msb = input_buffer[1];
-	_delay_ms(100);
-	YEL_PIN.setValue(false);
+	switch(lsb){						// Primary command
+		case(DEBUG_CTRL):{
+			switch(msb){
+				case(RED_ON):{
+					RED_PIN.setValue(true);
+					break;
+				}
+				case(GRN_ON):{
+					GRN_PIN.setValue(true);
+					break;
+				}
+				case(YEL_ON):{
+					YEL_PIN.setValue(true);
+					break;
+				}
+				case(RED_OFF):{
+					RED_PIN.setValue(false);
+					break;
+				}
+				case(GRN_OFF):{
+					GRN_PIN.setValue(false);
+					break;
+				}
+				case(YEL_OFF):{
+					YEL_PIN.setValue(false);
+					break;
+				}
+			}
+			break;
+		}
+		
+		default:{
+			
+		}
+	}
+	_delay_ms(50);
 }	
 
 void forward_holes(uint8_t holes){
@@ -54,5 +87,5 @@ void init(){
 }
 
 void idle(void){
-	GRN_PIN.setValue(true);
+	return;
 }
