@@ -42,6 +42,6 @@ void loop()
     Wire.endTransmission();
     Serial.print("Sent a 8 then a ");
     Serial.println(commands[com],DEC);
-    delay(2000);           // wait 8 seconds for next scan
+    delay(1000);           // wait 8 seconds for next scan
   }
 }
