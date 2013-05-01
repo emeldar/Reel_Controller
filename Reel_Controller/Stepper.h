@@ -11,11 +11,12 @@
 
 class Stepper {
 	private:
-		uint8_t ticks;
-		uint8_t period;
+		uint16_t ticks;
+		uint16_t period;
 		Pin en;
 		Pin dir;
 		Pin step;
+		void tick_inc(void);
 	public:
 		Stepper(Pin en, Pin dir, Pin step);
         void setSpeed(uint16_t steps_per_s);
@@ -24,4 +25,10 @@ class Stepper {
         void enable(void);
 		void stopTimer(void);
 		void startTimer(void);
+		
+		friend void stepCounter(void);
 };
+
+void startSteppers(void);
+void addStepper(const Stepper &cStepper1);
+void stepCounter(void);

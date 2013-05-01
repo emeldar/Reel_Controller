@@ -4,7 +4,8 @@
  * Created: 2/28/2013 10:10:47 PM
  *  Author: Anthony
  */ 
-#define F_CPU  16000000UL
+
+#include "global.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -15,11 +16,15 @@
 #include "usitwislave.h"
 #include "Reel_Controller.h"
 #include "analog.h"
+#include "Stepper.h"
+
+Stepper lights(RED_PIN, GRN_PIN, YEL_PIN);
 
 int main(void)
 {	
 	init();
-	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);		// Never returns
+	GRN_PIN.setValue(true);
+	//usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);		// Never returns
 }
 
 void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length, 
@@ -84,6 +89,8 @@ void init(){
 	
 	// Initialize all analog pins to input
 	DDRF = 0x00;
+	
+
 }
 
 void idle(void){

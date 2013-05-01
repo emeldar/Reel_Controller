@@ -16,9 +16,6 @@
 // Tuned parameters
 #define THRESH					700
 
-// Clock
-#define F_CPU  16000000UL
-
 // Primary Commands
 // Note stepper channels are addressed by 0-7
 #define DEBUG_CTRL				8
