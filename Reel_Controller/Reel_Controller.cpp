@@ -9,8 +9,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include "Pin.h"
+
 #include "Configuration.h"
+#include "Pin.h"
+#include "usitwislave.h"
 #include "Reel_Controller.h"
 #include "analog.h"
 
@@ -18,6 +20,7 @@ int main(void)
 {	
 	init();
 	analog::init(1);
+	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);
 
 	while (1) {
 		analog::set_channel(1);
@@ -25,10 +28,12 @@ int main(void)
 	}
 }
 
-void handle_rx(uint8_t* buffer, int len)
+void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length, 
+				volatile const uint8_t *input_buffer, volatile uint8_t *output_buffer_length, 
+				volatile uint8_t *output_buffer)
 {
-	uint8_t lsb = buffer[0];
-	uint8_t msb = buffer[1];
+	uint8_t lsb = input_buffer[0];
+	uint8_t msb = input_buffer[1];
 
 }	
 
@@ -50,4 +55,8 @@ void init(){
 	
 	// Initialize all analog pins to input
 	DDRF = 0x00;
+}
+
+void idle(void){
+	return;
 }

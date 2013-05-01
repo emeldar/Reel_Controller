@@ -1,52 +1,46 @@
 /*
  * Stepper.cpp
- * Rewriting to use timers
+ * Rewriting to use timer 0.
  *
  * Created: 3/8/2013 3:15:53 PM
  *  Author: Anthony
  */ 
 
 #include "Stepper.h"
-#include <util/delay.h>
 #include "Pin.h"
 #include <avr/io.h>
 
-#define		STEP_PIN	Pin(PortD,6)
-#define		DIR_PIN		Pin(PortD,7)
-#define		EN_PIN		Pin(PortD,5)
-#define		FWD			0
-#define		BWD			1
+Stepper::Stepper(Pin en_in, Pin dir_in, Pin step_in){
+	en = en_in;
+	dir = dir_in;
+	step = step_in;
+	en.setDirection(true);
+	dir.setDirection(true);
+	step.setDirection(true);
+	disable();
+	startTimer();
+}
 
-namespace stepper {
-	uint32_t speed;					// Speed in steps per second
-	
-	void init_stepper(void){
-		STEP_PIN.setDirection(true);
-		DIR_PIN.setDirection(true);
-		EN_PIN.setDirection(true);
-		set_direction(FWD);
-		set_speed(0);
-	}
+void Stepper::setSpeed(uint16_t steps_per_s){
+	period = (F_CPU/1024)/(steps_per_s);
+}
 
-	void set_speed(uint16_t inspeed){
-		speed = inspeed;
-	}
-	
-	void set_direction(uint8_t dir){
-		DIR_PIN.setValue(dir);
-	}		
-	
-	void start(uint16_t pos){
-	}
-	
-	void stop(uint16_t pos){
-	}
-	
-	void take_steps(uint16_t steps){
-		uint32_t del = 1000000/speed;
-		for (uint16_t n=0; n<steps; n++){
-			STEP_PIN.setValue(!STEP_PIN.getValue());
-			//_delay_us(del);
-		}
-	}
+void Stepper::setDirection(uint8_t fwd){
+	dir.setValue(fwd);
+}
+
+void Stepper::disable(void){
+	en.setValue(true);
+}
+
+void Stepper::enable(void){
+	en.setValue(false);
+}
+
+void Stepper::stopTimer(void){
+	TCCR0A &= ~(1<<CS00)|(1<<CS02));	// Timer off
+}
+
+void Stepper::startTimer(void){
+	TCCR0A |= (1<<CS00)|(1<<CS02);	// Prescaler = 1024
 }
