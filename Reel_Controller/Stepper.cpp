@@ -6,21 +6,20 @@
  *  Author: Anthony
  */ 
 
-#include "global.h"
+#include "Configuration.h"
 #include "Stepper.h"
 #include "Pin.h"
-#include "timer.h"
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 Stepper *stepperList[8];
 uint8_t nSteppers;
 
 // Add all steppers first
 void startSteppers(void){
-	// Initialize timer0
-	timer0Init();
-	timer0SetPrescaler(TIMER_CLK_DIV1);
-	timerAttach(0, stepCounter);		// Timer 0 overflow, about 60 KHz
+	TCCR2A |= (1<<CS20);		// Initialize Timer0 with no prescaler	
+	TIMSK2 |= (1<<TOIE2);		// Enable interrupt on overflow
+	sei();						// Enable all interrupts
 }
 
 void addStepper(Stepper *Stepper1){
@@ -28,11 +27,19 @@ void addStepper(Stepper *Stepper1){
 	nSteppers++;
 }
 
+Stepper * getStepper(uint8_t stepperNumber){
+	return stepperList[stepperNumber];
+}
+
 void stepCounter(void){
 	uint8_t s;
 	for (s = 0; s<=nSteppers; s++){
 		stepperList[s]->tick_inc();
 	}
+}
+
+ISR(TIMER2_OVF_vect) {
+	stepCounter();
 }
 
 Stepper::Stepper(Pin en_in, Pin dir_in, Pin step_in){
@@ -43,7 +50,6 @@ Stepper::Stepper(Pin en_in, Pin dir_in, Pin step_in){
 	setDirection(true);
 	setSpeed(1);
 	disable();
-	addStepper(this);
 }
 
 void Stepper::setSpeed(uint16_t steps_per_s){
