@@ -29,7 +29,7 @@ void setup()
 
 void loop()
 {
-  char inStr[5];
+  char inStr[16];
   int ind;
   int address = 0x12;
   int lsb;
@@ -43,6 +43,7 @@ void loop()
     inStr[ind] = Serial.read();
     ind++;
     inStr[ind] = 0x00;
+    delay(100);
   }
   lsb = atoi(inStr);
   

@@ -16,21 +16,23 @@
 #include "analog.h"
 #include "Stepper.h"
 
-stepperArray = new *Stepper[8];
-stepperArray[0] = new Stepper (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[1] = new one (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[2] = Stepper two (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[3] = Stepper three (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[4] = Stepper four (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[5] = Stepper five (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[6] = Stepper six (RED_PIN, GRN_PIN, YEL_PIN);
-stepperArray[7] = Stepper seven (RED_PIN, GRN_PIN, YEL_PIN);
-
+Stepper stepperArray[] = {};
 
 int main(void)
 {	
+	stepperArray[0] = Stepper (RED_PIN, GRN_PIN, YEL_PIN);
+	stepperArray[1] = Stepper (EN1, STEP1, DIR1);
+//	Stepper stepperArray[8] = {	Stepper (RED_PIN, GRN_PIN, YEL_PIN),
+//								Stepper (EN1, STEP1, DIR1),
+//								Stepper (EN2, STEP2, DIR2),
+//								Stepper (EN3, STEP3, DIR3),
+//								Stepper (EN4, STEP4, DIR4),
+//								Stepper (EN5, STEP5, DIR5),
+//								Stepper (EN6, STEP6, DIR6),
+//								Stepper (EN7, STEP7, DIR7)  };
 	init();
-	addStepper(&lights);
+	addStepper(&stepperArray[0]);
+	addStepper(&stepperArray[1]);
 	startSteppers();
 	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);		// Never returns
 }
@@ -44,7 +46,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 	if (pri <= 7){								// General stepper command
 		switch(sec){
 			case(STEP_ENABLE):{
-				RED_PIN.setValue(true);
+				//stepperArray[pri].enable();
 				break;
 			}
 			case(STEP_DISABLE):{

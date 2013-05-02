@@ -27,10 +27,6 @@ void addStepper(Stepper *Stepper1){
 	nSteppers++;
 }
 
-Stepper * getStepper(uint8_t stepperNumber){
-	return stepperList[stepperNumber];
-}
-
 void stepCounter(void){
 	uint8_t s;
 	for (s = 0; s<=nSteppers; s++){
@@ -42,10 +38,10 @@ ISR(TIMER2_OVF_vect) {
 	stepCounter();
 }
 
-Stepper::Stepper(Pin en_in, Pin dir_in, Pin step_in){
+Stepper::Stepper(Pin en_in, Pin step_in, Pin dir_in){
 	en = en_in;
-	dir = dir_in;
 	step = step_in;
+	dir = dir_in;
 	disable();
 	setDirection(true);
 	setSpeed(1);
@@ -53,7 +49,7 @@ Stepper::Stepper(Pin en_in, Pin dir_in, Pin step_in){
 }
 
 void Stepper::setSpeed(uint16_t steps_per_s){
-	period = (62500/(steps_per_s));				// Assumes 8 bit overflow and 16 MHz clock
+	period = (31250/(steps_per_s));				// Assumes 8 bit overflow and 16 MHz clock
 }
 
 void Stepper::setDirection(uint8_t fwd){

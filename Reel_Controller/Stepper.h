@@ -31,5 +31,4 @@ class Stepper {
 
 void startSteppers(void);
 void addStepper(Stepper *Stepper1);
-Stepper * getStepper(uint8_t stepperNumber)
 void stepCounter(void);

@@ -84,7 +84,7 @@ public:
 
 extern AvrPort PortA, PortB, PortC, PortD;
 
-#if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__) || (__AVR_ATmega325A)
+#if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__) || (__AVR_ATmega325A__)
     extern AvrPort PortE, PortF, PortG, PortH;
     extern AvrPort PortJ, PortK, PortL;
 #endif // __AVR_ATmega1280__

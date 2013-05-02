@@ -87,7 +87,7 @@ AvrPort PortC(0x26);
 AvrPort PortD(0x29);
 #if defined (__AVR_ATmega1280__) || \
 	defined (__AVR_ATmega2560__) || \
-	defined (__AVR_ATmega325A__)
+	defined(__AVR_ATmega325A__)
 AvrPort PortE(0x2C);
 AvrPort PortF(0x2F);
 AvrPort PortG(0x32);
