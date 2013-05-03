@@ -16,7 +16,6 @@ class Stepper {
 		Pin en;
 		Pin dir;
 		Pin step;
-		void tick_inc(void);
 	public:
 		Stepper(Pin en, Pin dir, Pin step);
         void setSpeed(uint16_t steps_per_s);
@@ -25,6 +24,7 @@ class Stepper {
         void enable(void);
 		void stopTimer(void);
 		void startTimer(void);
+		void tick_inc(void);
 		
 		friend void stepCounter(void);
 };

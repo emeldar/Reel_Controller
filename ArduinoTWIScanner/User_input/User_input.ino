@@ -57,6 +57,7 @@ void loop()
     inStr[ind] = Serial.read();
     ind++;
     inStr[ind] = 0x00;
+    delay(100);
   }
   msb = atoi(inStr);
   

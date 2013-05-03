@@ -7,6 +7,10 @@
 #include "usitwislave_devices.h"
 #include "usitwislave.h"
 
+//debug
+#include "Configuration.h"
+#include "Pin.h"
+
 #define always_inline __attribute__((always_inline))
 
 enum
@@ -386,7 +390,7 @@ void usi_twi_slave(uint8_t slave_address_in, uint8_t use_sleep,
 
 					output_buffer_length	= 0;
 					output_buffer_current	= 0;
-
+					
 					data_callback(buffer_size, input_buffer_length, input_buffer, &output_buffer_length, output_buffer);
 
 					input_buffer_length		= 0;

@@ -14,10 +14,11 @@
 
 Stepper *stepperList[8];
 uint8_t nSteppers;
+uint8_t s;
 
 // Add all steppers first
 void startSteppers(void){
-	TCCR2A |= (1<<CS20);		// Initialize Timer0 with no prescaler	
+	TCCR2A |= (1<<CS21)|(1<<CS20);		// Initialize Timer2 with 32x prescaler0
 	TIMSK2 |= (1<<TOIE2);		// Enable interrupt on overflow
 	sei();						// Enable all interrupts
 }
@@ -35,6 +36,14 @@ void stepCounter(void){
 }
 
 ISR(TIMER2_OVF_vect) {
+	stepperList[0]->tick_inc();
+	stepperList[1]->tick_inc();
+	stepperList[2]->tick_inc();
+	stepperList[3]->tick_inc();
+	stepperList[4]->tick_inc();
+	stepperList[5]->tick_inc();
+	stepperList[6]->tick_inc();
+	stepperList[7]->tick_inc();
 	stepCounter();
 }
 
@@ -42,6 +51,7 @@ Stepper::Stepper(Pin en_in, Pin step_in, Pin dir_in){
 	en = en_in;
 	step = step_in;
 	dir = dir_in;
+	ticks = 0;
 	disable();
 	setDirection(true);
 	setSpeed(1);
@@ -49,7 +59,7 @@ Stepper::Stepper(Pin en_in, Pin step_in, Pin dir_in){
 }
 
 void Stepper::setSpeed(uint16_t steps_per_s){
-	period = (31250/(steps_per_s));				// Assumes 8 bit overflow and 16 MHz clock
+	period = (977/(steps_per_s));				// Assumes 8 bit overflow and 16/32 MHz clock
 }
 
 void Stepper::setDirection(uint8_t fwd){
@@ -66,12 +76,12 @@ void Stepper::enable(void){
 
 void Stepper::tick_inc(void){
 	ticks++;
-	if (ticks >= period){
-		if (step.getValue()==false){
-			step.setValue(true);
-		} else {
-			step.setValue(false);
+		if (ticks >= period){
+			if (step.getValue()==false){
+				step.setValue(true);
+			} else {
+				step.setValue(false);
+			}
+			ticks = 0;
 		}
-		ticks = 0;
-	}
 }					
