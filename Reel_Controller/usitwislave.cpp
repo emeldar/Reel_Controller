@@ -7,10 +7,6 @@
 #include "usitwislave_devices.h"
 #include "usitwislave.h"
 
-//debug
-#include "Configuration.h"
-#include "Pin.h"
-
 #define always_inline __attribute__((always_inline))
 
 enum

@@ -20,6 +20,10 @@ Stepper *stepperArray[8];
 
 int main(void)
 {	
+	init();
+	
+	RED_PIN.setValue(true);
+	
 	// Delay between instantiations to avoid ISR overloading
 	Stepper zero = Stepper (EN0, STEP0, DIR0);  // Stepper (EN0, STEP0, DIR0)
 	_delay_ms(1);
@@ -45,8 +49,6 @@ int main(void)
 	stepperArray[5] = &five;
 	stepperArray[6] = &six;
 	stepperArray[7] = &seven;
-
-	init();
 	
 	addStepper(stepperArray[0]);
 	addStepper(stepperArray[1]);
@@ -58,6 +60,10 @@ int main(void)
 	addStepper(stepperArray[7]);
 	
 	startSteppers();
+	
+	RED_PIN.setValue(false);
+	GRN_PIN.setValue(true);
+	
 	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);		// Never returns
 }
 
@@ -65,6 +71,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 				volatile const uint8_t *input_buffer, volatile uint8_t *output_buffer_length, 
 				volatile uint8_t *output_buffer)
 {
+	YEL_PIN.setValue(true);
 	uint8_t pri = input_buffer[0];
 	uint8_t sec = input_buffer[1];
 	if (pri <= 7){								// General stepper command
@@ -96,7 +103,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 		}
 	}
 	
-	else if (pri <= 15){								// General stepper command
+	else if (pri <= 15){								// Stepper speed command
 		stepperArray[pri-8]->setSpeed(sec);
 	}
 		
@@ -128,6 +135,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 			}
 		}
 	}
+	YEL_PIN.setValue(false);
 }	
 
 void forward_holes(uint8_t holes){
