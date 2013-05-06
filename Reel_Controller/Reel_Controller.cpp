@@ -71,7 +71,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 				volatile const uint8_t *input_buffer, volatile uint8_t *output_buffer_length, 
 				volatile uint8_t *output_buffer)
 {
-	YEL_PIN.setValue(true);
+	RED_PIN.setValue(true);
 	uint8_t pri = input_buffer[0];
 	uint8_t sec = input_buffer[1];
 	if (pri <= 7){								// General stepper command
@@ -135,7 +135,13 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 			}
 		}
 	}
-	YEL_PIN.setValue(false);
+	
+	RED_PIN.setValue(false);
+	if (YEL_PIN.getValue()==false){
+		YEL_PIN.setValue(true);
+	} else {
+		YEL_PIN.setValue(false);
+	}
 }	
 
 void forward_holes(uint8_t holes){
