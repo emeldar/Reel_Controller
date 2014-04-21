@@ -77,6 +77,7 @@ public:
         AvrPort(port_base_t port_base_in);
         bool isNull();
         void setPinDirection(uint8_t pin_index, bool out);
+		void invPin(uint8_t pin_index);
         bool getPin(uint8_t pin_index);
         void setPin(uint8_t pin_index, bool on);
 };

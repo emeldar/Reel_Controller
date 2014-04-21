@@ -23,7 +23,7 @@ int main(void)
 	init();
 	
 	RED_PIN.setValue(true);
-	
+
 	// Delay between instantiations to avoid ISR overloading
 	Stepper zero = Stepper (EN0, STEP0, DIR0);  // Stepper (EN0, STEP0, DIR0)
 	_delay_ms(1);
@@ -50,18 +50,17 @@ int main(void)
 	stepperArray[6] = &six;
 	stepperArray[7] = &seven;
 	
-	addStepper(stepperArray[0]);
-	addStepper(stepperArray[1]);
-	addStepper(stepperArray[2]);
-	addStepper(stepperArray[3]);
-	addStepper(stepperArray[4]);
-	addStepper(stepperArray[5]);
-	addStepper(stepperArray[6]);
-	addStepper(stepperArray[7]);
-	
+	for(uint8_t i=0; i<8; i++){
+		addStepper(stepperArray[i]);
+		stepperArray[i]->setSpeed(60);
+	}
+
 	startSteppers();
 	
 	RED_PIN.setValue(false);
+	YEL_PIN.setValue(true);
+	// Home Reels
+	YEL_PIN.setValue(false);
 	GRN_PIN.setValue(true);
 	
 	usi_twi_slave(SLAVE_ADDRESS, 0, handle_twi, idle);		// Never returns
@@ -71,7 +70,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 				volatile const uint8_t *input_buffer, volatile uint8_t *output_buffer_length, 
 				volatile uint8_t *output_buffer)
 {
-	RED_PIN.setValue(true);
+	YEL_PIN.setValue(true);
 	uint8_t pri = input_buffer[0];
 	uint8_t sec = input_buffer[1];
 	if (pri <= 7){								// General stepper command
@@ -85,19 +84,27 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 				break;
 			}
 			case(STEP_FWD):{
-				stepperArray[pri]->setDirection(1);
-				break;
-			}
-			case(STEP_BWD):{
 				stepperArray[pri]->setDirection(0);
 				break;
 			}
+			case(STEP_BWD):{
+				stepperArray[pri]->setDirection(1);
+				break;
+			}
 			case(NEXT_HOLE):{
-				GRN_PIN.setValue(false);
+				forward_hole(pri);
 				break;
 			}
 			case(LAST_HOLE):{
-				YEL_PIN.setValue(false);
+				backward_hole(pri);
+				break;
+			}
+			case(NEXT_BB):{
+				forward_bb(pri);
+				break;
+			}
+			case(LAST_BB):{
+				backward_bb(pri);
 				break;
 			}
 		}
@@ -136,16 +143,27 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 		}
 	}
 	
-	RED_PIN.setValue(false);
-	if (YEL_PIN.getValue()==false){
-		YEL_PIN.setValue(true);
-	} else {
-		YEL_PIN.setValue(false);
-	}
+	YEL_PIN.setValue(false);
 }	
 
-void forward_holes(uint8_t holes){
-	
+void forward_hole(uint8_t stepper){
+	stepperArray[stepper]->setDirection(false);
+	stepperArray[stepper]->takeSteps(905);
+}
+
+void backward_hole(uint8_t stepper){
+	stepperArray[stepper]->setDirection(true);
+	stepperArray[stepper]->takeSteps(905);
+}
+
+void forward_bb(uint8_t stepper){
+	stepperArray[stepper]->setDirection(false);
+	stepperArray[stepper]->takeSteps(3632);			// 3621.6 in theory, this value is tuned.
+}
+
+void backward_bb(uint8_t stepper){
+	stepperArray[stepper]->setDirection(true);
+	stepperArray[stepper]->takeSteps(3632);
 }
 
 void init(){

@@ -64,6 +64,10 @@ void AvrPort::setPinDirection(uint8_t pin_index, bool out) {
         DDRx = (DDRx & ~_BV(pin_index)) | (out?_BV(pin_index):0);
 }
 
+void AvrPort::invPin(uint8_t pin_index) {
+		bool on = (PINx & _BV(pin_index)) == 0;
+		PORTx = (PORTx & ~_BV(pin_index)) | (on?_BV(pin_index):0);
+}
 
 bool AvrPort::getPin(uint8_t pin_index) {
         return (PINx & _BV(pin_index)) != 0;

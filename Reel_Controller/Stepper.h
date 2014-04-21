@@ -16,17 +16,17 @@ class Stepper {
 		Pin en;
 		Pin dir;
 		Pin step;
+		volatile uint16_t stepCount;
 	public:
 		Stepper(Pin en, Pin dir, Pin step);
-        void setSpeed(uint16_t steps_per_s);
+        void setSpeed(uint8_t steps_per_s);
 		void setDirection(uint8_t fwd);
         void disable(void);
         void enable(void);
 		void stopTimer(void);
 		void startTimer(void);
 		void tick_inc(void);
-		
-		friend void stepCounter(void);
+		void takeSteps(uint16_t numSteps);
 };
 
 void startSteppers(void);

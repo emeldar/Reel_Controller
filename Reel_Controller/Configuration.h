@@ -33,6 +33,8 @@
 #define STEP_BWD				4
 #define NEXT_HOLE				5
 #define LAST_HOLE				6
+#define NEXT_BB					7
+#define LAST_BB					8
 
 // Debug control commands, primary 50
 #define RED_ON					1
