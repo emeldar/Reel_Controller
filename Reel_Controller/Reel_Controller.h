@@ -1,5 +1,5 @@
 /*
- * IncFile1.h
+ * Reel_Controller.h
  *
  * Created: 2/28/2013 11:52:07 PM
  *  Author: Anthony
@@ -15,3 +15,5 @@ void forward_hole(uint8_t);
 void backward_hole(uint8_t);
 void forward_bb(uint8_t);
 void backward_bb(uint8_t);
+void locate_next(uint8_t);
+void db_pulse(void);

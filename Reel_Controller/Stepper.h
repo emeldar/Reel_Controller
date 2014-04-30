@@ -9,6 +9,9 @@
 #include "Pin.h"
 #include <avr/io.h>
 
+#define FWD false
+#define BWD true
+
 class Stepper {
 	private:
 		uint16_t ticks;
@@ -20,7 +23,7 @@ class Stepper {
 	public:
 		Stepper(Pin en, Pin dir, Pin step);
         void setSpeed(uint8_t steps_per_s);
-		void setDirection(uint8_t fwd);
+		void setDirection(uint8_t bwd);
         void disable(void);
         void enable(void);
 		void stopTimer(void);

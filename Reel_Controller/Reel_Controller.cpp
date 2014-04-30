@@ -17,6 +17,7 @@
 #include "Stepper.h"
 
 Stepper *stepperArray[8];
+uint16_t peakVals[8];
 
 int main(void)
 {	
@@ -49,17 +50,47 @@ int main(void)
 	stepperArray[5] = &five;
 	stepperArray[6] = &six;
 	stepperArray[7] = &seven;
-	
-	for(uint8_t i=0; i<8; i++){
-		addStepper(stepperArray[i]);
-		stepperArray[i]->setSpeed(60);
-	}
-
 	startSteppers();
 	
+	for(uint8_t i=0; i<8; i++){				// Initialize, backing up a hole for re-homing
+		addStepper(stepperArray[i]);
+		stepperArray[i]->setSpeed(CRUISE);
+		stepperArray[i]->setDirection(BWD);
+		stepperArray[i]->takeSteps(905);
+		stepperArray[i]->setDirection(FWD);
+	}
+
 	RED_PIN.setValue(false);
 	YEL_PIN.setValue(true);
-	// Home Reels
+	
+	// Home reels (record peak values for calibration as well)
+	uint16_t pk;
+	uint16_t last;
+	uint16_t timeout;
+	for (uint8_t i = 0; i < 8; i++){
+		analog::set_channel(i);
+		stepperArray[i]->enable();
+		pk = 0;
+		last = 0;
+		timeout = 0;
+		while(pk < last + NOISE){		// 15 for noise (73mV). Typical peak is 2.5V (or 512 from ADC).
+			stepperArray[i]->takeSteps(5);
+			last = analog::read_once();
+			if (last > pk){
+				pk = last;
+			}
+			timeout++;
+			if (timeout > 300){
+				break;
+			}
+		}
+		if (timeout < 299){
+			db_pulse();			// Pulse 1: This is the channel's peak value.
+			peakVals[i] = pk;
+			locate_next(i);		// Pulse 2-5: Find center of next hole and home in on it.
+		}
+	}
+	
 	YEL_PIN.setValue(false);
 	GRN_PIN.setValue(true);
 	
@@ -147,8 +178,7 @@ void handle_twi(uint8_t buffer_size, volatile uint8_t input_buffer_length,
 }	
 
 void forward_hole(uint8_t stepper){
-	stepperArray[stepper]->setDirection(false);
-	stepperArray[stepper]->takeSteps(905);
+	locate_next(stepper);
 }
 
 void backward_hole(uint8_t stepper){
@@ -158,12 +188,63 @@ void backward_hole(uint8_t stepper){
 
 void forward_bb(uint8_t stepper){
 	stepperArray[stepper]->setDirection(false);
-	stepperArray[stepper]->takeSteps(3632);			// 3621.6 in theory, this value is tuned.
+	stepperArray[stepper]->takeSteps(3632);			// 3621.6 in theory, this value is tuned b/c effective sprocket diameter is unpredictable.
 }
 
 void backward_bb(uint8_t stepper){
 	stepperArray[stepper]->setDirection(true);
 	stepperArray[stepper]->takeSteps(3632);
+}
+
+// This function will advance you to the next hole, with backlash compensation. Use 226.3 steps/mm.
+// This is kind of messy because of the analog sensors and backlash in the motor and sprocket.
+// From scoping, it looks like we could have around half a hole (750 um) of backlash!
+// Procedure:
+// 1) If we're currently over a hole, move up 6mm. Otherwise, 4mm. This puts us after target.
+// 2) Move back until first threshold is found. Start step counting.
+// 3) Move back until second threshold is found. End step counting; this is the adjusted hole width.
+// 4) Move forward until first threshold is found.
+// 5) Move forward half of the adjusted hole width. Done!
+void locate_next(uint8_t chan){
+	uint16_t sCount = 0;
+	uint16_t aRead = 0;
+	uint16_t thresh = peakVals[chan]/2;			// The hole width is measured from half-peak threshold.
+	analog::set_channel(chan);
+	analog::start();
+	stepperArray[chan]->setDirection(FWD);
+	stepperArray[chan]->setSpeed(CRUISE);
+	if (analog::get() > thresh){				// Move up past the next hole
+		stepperArray[chan]->takeSteps(1350);	
+	} else {
+		stepperArray[chan]->takeSteps(900);
+	}
+	stepperArray[chan]->setDirection(BWD);
+	stepperArray[chan]->setSpeed(CRAWL);
+	stepperArray[chan]->enable();
+	while (aRead < thresh){					// Measure the hole width backwards
+		aRead = analog::get();
+	}
+	db_pulse();									// Pulse 1: Begin measurement								// Pulse 2: We've reached first threshold
+	stepperArray[chan]->takeSteps(10);			// Get clear of first threshold
+	sCount = 10;								// We're measuring width now
+	aRead = 1024;
+	while (aRead > thresh){
+		aRead = analog::get();
+		stepperArray[chan]->takeSteps(1);
+		sCount++;
+	}
+	db_pulse();									// Pulse 2: Reached second threshold
+	stepperArray[chan]->takeSteps(30);			// Clear second threshold
+	stepperArray[chan]->setDirection(FWD);		// Move forward past threshold to home position.
+	stepperArray[chan]->enable();
+	aRead = 0;
+	while (aRead < thresh){						// Find second threshold going forward
+		aRead = analog::get();
+	}
+	stepperArray[chan]->takeSteps(sCount/2);
+	stepperArray[chan]->setSpeed(CRUISE);
+	db_pulse(); // Pulse 4: We're home
+	analog::stop();
 }
 
 void init(){
@@ -173,15 +254,25 @@ void init(){
 	DDRG |= 0x07;	// 0-2 Port G
 	DDRD |= 0xFF;	// All Port D (Includes debug LEDs)
 	
-	// Re-do debug LEDs with neat Pin objects
+	// Define debug LEDs with neat Pin objects
 	RED_PIN.setDirection(true);
 	GRN_PIN.setDirection(true);
 	YEL_PIN.setDirection(true);
 	
 	// Initialize all analog pins to input
 	DDRF = 0x00;
+	
+	// Initialize analog settings
+	analog::init(1);
 }
 
 void idle(void){
 	return;
+}
+
+// This is an oscilloscope-detectable pulse on red LED for debugging.
+void db_pulse(void){
+	RED_PIN.setValue(true);
+	_delay_ms(5);
+	RED_PIN.setValue(false);
 }

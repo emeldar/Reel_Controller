@@ -16,7 +16,9 @@
 #define YEL_PIN					Pin(PortD,2)
 
 // Tuned parameters
-#define THRESH					700
+#define CRUISE					80
+#define CRAWL					15
+#define NOISE					15
 
 // Primary Commands
 // Note stepper channel commands are addressed by 0-7

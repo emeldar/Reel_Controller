@@ -17,7 +17,7 @@ uint8_t nSteppers;
 
 // Add all steppers first
 void startSteppers(void){
-	TCCR2A |= (1<<CS21);		// Initialize Timer2 with 8x prescaler
+	TCCR2A |= (1<<CS21);				// Initialize Timer2 with 8x prescaler
 	TIMSK2 |= (1<<TOIE2);				// Enable interrupt on overflow
 	sei();								// Enable all interrupts
 }
@@ -77,10 +77,11 @@ void Stepper::tick_inc(void){
 
 void Stepper::takeSteps(uint16_t numSteps){
 	numSteps = 2*numSteps;		// Only steps on rising edge
-	enable();
 	stepCount = 0;
+	char sreg = SREG;
+	enable();
 	sei();
-	while(stepCount<=numSteps){}
+	while(stepCount<numSteps){}
 	disable();
-	cli();
+	SREG = sreg;
 }
